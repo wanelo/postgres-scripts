@@ -14,7 +14,7 @@ MASTER_IP=$1
 svcadm disable -s postgres924
 svcadm disable -s chef-client
 
-mv /var/pgsql/data92 /var/pgsql/data92.original
+mv -f /var/pgsql/data92 /var/pgsql/data92.original
 /opt/local/postgres-9.2.4/bin/pg_basebackup -x -D /var/pgsql/data92 -P -U postgres -h $MASTER_IP
 chown -R postgres:postgres /var/pgsql/data92
 
