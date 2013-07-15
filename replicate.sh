@@ -23,6 +23,9 @@ standby_mode = 'on'
 primary_conninfo = 'host=$MASTER_IP'
 # stops replication, becomes master if the file is found
 trigger_file = '/var/pgsql/data92/trigger'
+
+restore_command = 'cp /var/pgsql/data92/wal_archive/%f %p'
+recovery_target_timeline = 'latest'
 DELIM
 
 chown postgres:postgres /var/pgsql/data92/recovery.conf
