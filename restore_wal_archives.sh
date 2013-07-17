@@ -20,6 +20,7 @@ if [ ! -f /var/pgsql/data92/recovery.conf ]; then
 fi
 
 svcadm disable -s $SERVICE
+rm -rf /var/pgsql/data92/wal_archive
 mkdir -p /var/pgsql/data92/wal_archive
 cp -v -r  /backups/$MASTER/pgsql/wal_archive/* /var/pgsql/data92/wal_archive/
 chown -R postgres:postgres /var/pgsql/data92/wal_archive
