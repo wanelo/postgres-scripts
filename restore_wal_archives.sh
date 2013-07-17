@@ -3,9 +3,20 @@
 export MASTER=$1
 export SERVICE=postgres924
 
+function usage {
+  echo "USAGE: $0 <master_fqdn>"
+}
+
 if [ -z $MASTER ]; then
-  echo "USAGE: $0 <fqdn of master>"
+  usage
   exit 1
+fi
+
+if [ ! -f /var/pgsql/data92/recovery.conf ]; then
+  echo "Script can only be run on a Postgres replica. Missing recovery.conf."
+  echo
+  usage
+  exit 3
 fi
 
 svcadm disable -s $SERVICE
