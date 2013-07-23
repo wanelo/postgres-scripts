@@ -2,8 +2,8 @@
 
 max_dump_age="4"
 
-psql=$(ps auxwww | grep "[p]ostgres -D" | head -n 1 | awk '{print $11}' | sed 's/bin\/postgres/bin\/psql/')
-pg_dump=$(ps auxwww | grep "[p]ostgres -D" | head -n 1 | awk '{print $11}' | sed 's/bin\/postgres/bin\/pg_dump/')
+psql=$(ps -eo comm | grep [p]ostgres | head -n 1 | sed 's/bin\/postgres/bin\/psql/')
+pg_dump=$(ps -eo comm | grep [p]ostgres | head -n 1 | sed 's/bin\/postgres/bin\/pg_dump/')
 databases=$(psql -U postgres -c "\l" | grep "^ " | grep -v "^   " | grep -v template0 | awk '{print $1}')
 backup_dir="$HOME/backups/postgres"
 date=$(date '+%Y%m%d%H%M%S')
