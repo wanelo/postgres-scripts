@@ -24,5 +24,5 @@ do
   echo "[$log_date] local backup of database \"$database\" finished"
 done
 
-echo "[$log_date] removing old backups"
+echo "[$log_date] removing old local backups"
 find $backup_dir -name "*.dump.gz" -mtime +$max_dump_age | xargs rm -f
