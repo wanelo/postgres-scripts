@@ -7,21 +7,20 @@ pg_dump=$(ps -eo comm | grep [p]ostgres | head -n 1 | sed 's/bin\/postgres/bin\/
 databases=$(psql -U postgres -c "\l" | grep "^ " | grep -v "^   " | grep -v template0 | awk '{print $1}')
 backup_dir="$HOME/backups/postgres"
 date=$(date '+%Y%m%d%H%M%S')
-log_date=$(date '+%d/%b/%Y:%H:%M:%S %z')
 
 mkdir -p $backup_dir
 
 for database in $databases
 do
-  echo "[$log_date] local backup of database \"$database\" started"
+  echo "[$(date '+%d/%b/%Y:%H:%M:%S %z')] local backup of database \"$database\" started"
   $pg_dump -Fc -U postgres $database | gzip > $backup_dir/$database.$date.dump.gz
-  echo "[$log_date] finished pg_dump of database \"$database\""
-  echo "[$log_date] starting analyze on database \"$database\""
+  echo "[$(date '+%d/%b/%Y:%H:%M:%S %z')] finished pg_dump of database \"$database\""
+  echo "[$(date '+%d/%b/%Y:%H:%M:%S %z')] starting analyze on database \"$database\""
   $psql -U postgres -c "set vacuum_freeze_min_age=100000;" --quiet $database
   $psql -U postgres -c "set vacuum_freeze_table_age=10000000;" --quiet $database
   $psql -U postgres -c "set maintenance_work_mem='1GB';" --quiet $database
   $psql -U postgres -c "analyze;" --quiet $database
-  echo "[$log_date] local backup of database \"$database\" finished"
+  echo "[$(date '+%d/%b/%Y:%H:%M:%S %z')] local backup of database \"$database\" finished"
 done
 
 echo "[$log_date] removing old local backups"
