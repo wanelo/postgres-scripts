@@ -9,7 +9,7 @@ if [ -z $1 ]; then
   exit 1
 fi
 
-## WARNING: There's a dropdb in here!
+## WARNING: There's a dropdb in here!  This script assumes that your databases have unique names.
 
 DB_BACKUP_NAME="$1"
 MOST_RECENT_BACKUP_FULL_PATH=$(mfind --type o /$MANTA_USER/stor/backups --name $DB_BACKUP_NAME | tail -n1)
