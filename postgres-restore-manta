@@ -1,5 +1,7 @@
 #!/bin/bash
 
+## WARNING: There's a dropdb in here!  This script assumes that your databases have unique names.
+
 function usage {
   echo "Usage: $0 <name_of_stored_db_to_restore>"
 }
@@ -8,8 +10,6 @@ if [ -z $1 ]; then
   usage
   exit 1
 fi
-
-## WARNING: There's a dropdb in here!  This script assumes that your databases have unique names.
 
 DB_BACKUP_NAME="$1"
 MOST_RECENT_BACKUP_FULL_PATH=$(mfind --type o /$MANTA_USER/stor/backups --name $DB_BACKUP_NAME | tail -n1)
