@@ -1,5 +1,7 @@
 #!/bin/bash
 
+## WARNING: There's a dropdb in here!
+
 DB_BACKUP_NAME="$1"
 MOST_RECENT_BACKUP_FULL_PATH=$(mfind --type o /$MANTA_USER/stor/backups --name $DB_BACKUP_NAME | tail -n1)
 MOST_RECENT_BACKUP=$(mls $MOST_RECENT_BACKUP_FULL_PATH)
