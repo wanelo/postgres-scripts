@@ -1,0 +1,10 @@
+#!/bin/bash
+
+DB_BACKUP_NAME="$1"
+MOST_RECENT_BACKUP_FULL_PATH=$(mfind --type o /$MANTA_USER/stor/backups --name $DB_BACKUP_NAME | tail -n1)
+MOST_RECENT_BACKUP=$(mls $MOST_RECENT_BACKUP_FULL_PATH)
+
+dropdb -U postgres $DB_BACKUP_NAME
+createdb -U postgres $DB_BACKUP_NAME
+
+mget --quiet $MOST_RECENT_BACKUP_FULL_PATH | gunzip -c | pg_restore --verbose --exit-on-error --dbname=$DB_BACKUP_NAME -Upostgres --format=c
