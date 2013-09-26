@@ -1,0 +1,30 @@
+#!/bin/bash
+
+export PATH="/opt/local/bin:/opt/local/sbin:/usr/bin:/usr/sbin"
+
+set -e
+
+datestamp=$(date +%Y%d%H)
+pgdata_path=$(pargs $(pgrep -o postgres) | head -n1 | awk '{print $4}')
+
+psql -h localhost -U postgres -c "SELECT pg_start_backup('$datestamp');"
+
+backup_snapshot=$(sdc-snapshot)
+
+if [ -z $backup_snapshot ]; then
+  exit 1
+fi
+
+until [ $(ls -lahd /checkpoints/$backup_snapshot 2>/dev/null | wc -l) -eq "1" ]
+  do
+    sleep 1
+  done
+
+psql -h localhost -U postgres -c 'SELECT pg_stop_backup();'
+
+tar -c /checkpoints/$backup_snapshot/$pgdata_path | lz4c -f - /root/backups/postgres/pgdata_$datestamp.tar.lz4
+
+for tarball in $(ls -lrt -d -1 /root/backups/postgres/*.tar.lz4 | awk '{print $9}')
+  do
+    /root/manta-backup/mbackup postgres $tarball >> /var/log/postgres/backup.log
+  done
