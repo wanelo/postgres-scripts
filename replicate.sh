@@ -19,14 +19,23 @@ MASTER_IP=$1
 DATA_DIR=${2:-$DEFAULT_DATA_DIR}
 SERVICE_NAME=$(svcs | grep postgres | awk '{ print $3 }')
 
+# Ensure services don't interrupt us
 svcadm disable -s $SERVICE_NAME
 svcadm disable -s chef-client
 
+# Clean up previous attempts
 rm -rf $DATA_DIR.original
 mv $DATA_DIR $DATA_DIR.original
+
+# Tune TCP window congestion settings
+ndd -set /dev/tcp tcp_recv_hiwat 2097152
+ndd -set /dev/tcp tcp_xmit_hiwat 2097152
+
+# Run base backup
 pg_basebackup -x -D $DATA_DIR -P -U postgres -h $MASTER_IP
 chown -R postgres:postgres $DATA_DIR
 
+# Configure recovery.conf file
 cat > $DATA_DIR/recovery.conf <<DELIM
 standby_mode = 'on'
 primary_conninfo = 'host=$MASTER_IP'
@@ -39,4 +48,5 @@ DELIM
 
 chown postgres:postgres $DATA_DIR/recovery.conf
 
-chef-client ## updates IP address in postgresql.conf
+# Update Postgres settings (local IP) and start it
+chef-client
