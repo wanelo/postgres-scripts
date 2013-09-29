@@ -1,7 +1,11 @@
 #!/bin/bash
  
 function usage {
-  echo "Usage: $0 <master_ip>"
+  echo "Usage: $0 <master_ip> [data_dir]"
+  echo "   master_ip : IP or fqdn to reach PostgreSQL master"
+  echo "   data_dir  : Data directory into which to install PostgreSQL : default /var/pgsql/data93"
+  echo
+  echo "   Note: pg_basebackup must be in PATH"
 }
  
 if [ -z $1 ]; then
@@ -9,26 +13,30 @@ if [ -z $1 ]; then
   exit 1
 fi
 
-MASTER_IP=$1
+DEFAULT_DATA_DIR='/var/pgsql/data93'
 
-svcadm disable -s postgres924
+MASTER_IP=$1
+DATA_DIR=${2:-$DEFAULT_DATA_DIR}
+SERVICE_NAME=$(svcs | grep postgres | awk '{ print $3 }')
+
+svcadm disable -s $SERVICE_NAME
 svcadm disable -s chef-client
 
-rm -rf /var/pgsql/data92.original
-mv /var/pgsql/data92 /var/pgsql/data92.original
-/opt/local/postgres-9.2.4/bin/pg_basebackup -x -D /var/pgsql/data92 -P -U postgres -h $MASTER_IP
-chown -R postgres:postgres /var/pgsql/data92
+rm -rf $DATA_DIR.original
+mv $DATA_DIR $DATA_DIR.original
+pg_basebackup -x -D $DATA_DIR -P -U postgres -h $MASTER_IP
+chown -R postgres:postgres $DATA_DIR
 
-cat > /var/pgsql/data92/recovery.conf <<DELIM
+cat > $DATA_DIR/recovery.conf <<DELIM
 standby_mode = 'on'
 primary_conninfo = 'host=$MASTER_IP'
 # stops replication, becomes master if the file is found
-trigger_file = '/var/pgsql/data92/trigger'
+trigger_file = '$DATA_DIR/trigger'
 
 restore_command = 'cp /var/pgsql/data92/wal_archive/%f %p'
 recovery_target_timeline = 'latest'
 DELIM
 
-chown postgres:postgres /var/pgsql/data92/recovery.conf
+chown postgres:postgres $DATA_DIR/recovery.conf
 
 chef-client ## updates IP address in postgresql.conf
