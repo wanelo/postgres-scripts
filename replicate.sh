@@ -29,7 +29,9 @@ svcadm disable -s chef-client
 rm -rf $DATA_DIR.original
 mv $DATA_DIR $DATA_DIR.original
 
-# Tune TCP window congestion settings
+# Tune TCP settings
+ndd -set /dev/tcp tcp_max_buf 2097152
+ndd -set /dev/tcp tcp_cwnd_max 2097152
 ndd -set /dev/tcp tcp_recv_hiwat 2097152
 ndd -set /dev/tcp tcp_xmit_hiwat 2097152
 
