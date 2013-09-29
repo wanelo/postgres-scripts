@@ -17,10 +17,12 @@ DEFAULT_DATA_DIR='/var/pgsql/data93'
 
 MASTER_IP=$1
 DATA_DIR=${2:-$DEFAULT_DATA_DIR}
-SERVICE_NAME=$(svcs | grep postgres | awk '{ print $3 }')
+SERVICE_NAME=$(svcs -a | grep postgres | awk '{ print $3 }')
 
 # Ensure services don't interrupt us
-svcadm disable -s $SERVICE_NAME
+if [ ! -z $SERVICE_NAME ]; then
+  svcadm disable -s $SERVICE_NAME
+fi
 svcadm disable -s chef-client
 
 # Clean up previous attempts
