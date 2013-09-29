@@ -36,7 +36,7 @@ ndd -set /dev/tcp tcp_recv_hiwat 2097152
 ndd -set /dev/tcp tcp_xmit_hiwat 2097152
 
 # Run base backup
-if [[ "/var/pgsql/data92" =~ "93" ]]; then
+if [[ "$DATA_DIR" =~ "93" ]]; then
   pg_basebackup -X stream -D $DATA_DIR -P -U postgres -h $MASTER_IP
 else
   pg_basebackup -X fetch -D $DATA_DIR -P -U postgres -h $MASTER_IP
