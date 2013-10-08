@@ -47,13 +47,8 @@ ndd -set /dev/tcp tcp_recv_hiwat 2097152
 ndd -set /dev/tcp tcp_xmit_hiwat 2097152
 
 # Run base backup
-if [[ "$DATA_DIR" =~ "92" ]]; then
-  echo "Starting basebackup, using -X fetch"
-  pg_basebackup -X fetch -D $DATA_DIR -P -U postgres -h $MASTER_IP
-else
-  echo "Starting basebackup, using -X stream (supported by PostgreSQL 9.3+)"
-  pg_basebackup -X stream -D $DATA_DIR -P -U postgres -h $MASTER_IP
-fi
+echo "Starting basebackup, using -X fetch"
+pg_basebackup -X fetch -D $DATA_DIR -P -U postgres -h $MASTER_IP
 
 if [ $? -ne 0 ]; then
   echo "ERROR: basebackup failed" >&2
