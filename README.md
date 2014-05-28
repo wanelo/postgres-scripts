@@ -5,7 +5,7 @@ Only tested on SmartOS.
 
 ## Dependencies
 
-* (postmodern)[https://github.com/wanelo/postmodern] installed
+* [postmodern](https://github.com/wanelo/postmodern) installed
 
 ## Start replication
 
