@@ -66,7 +66,7 @@ primary_conninfo = 'host=$MASTER_IP'
 # stops replication, becomes master if the file is found
 trigger_file = '$DATA_DIR/trigger'
 
-restore_command = 'cp /var/pgsql/data92/wal_archive/%f %p'
+restore_command = 'postmodern restore --filename %f --path %p'
 recovery_target_timeline = 'latest'
 DELIM
 
