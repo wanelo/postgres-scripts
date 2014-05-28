@@ -3,6 +3,10 @@ postgres-scripts
 
 Only tested on SmartOS.
 
+## Dependencies
+
+* (postmodern)[https://github.com/wanelo/postmodern] installed
+
 ## Start replication
 
 Creating a new replica from a master:
