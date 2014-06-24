@@ -48,7 +48,7 @@ ndd -set /dev/tcp tcp_xmit_hiwat 2097152
 
 # Run base backup
 echo "Starting basebackup, using -X fetch"
-pg_basebackup -X fetch -D $DATA_DIR -P -U postgres -h $MASTER_IP
+pg_basebackup -X fetch --checkpoint=fast -D $DATA_DIR -P -U postgres -h $MASTER_IP
 
 if [ $? -ne 0 ]; then
   echo "ERROR: basebackup failed" >&2
