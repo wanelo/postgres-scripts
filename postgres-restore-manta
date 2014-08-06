@@ -2,6 +2,10 @@
 
 ## WARNING: There's a dropdb in here!  This script assumes that your databases have unique names.
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+source $DIR/postgres-environment
+
 function usage {
   echo "Usage: $0 <name_of_stored_db_to_restore>"
 }
@@ -12,7 +16,7 @@ if [ -z $1 ]; then
 fi
 
 DB_BACKUP_NAME="$1"
-MOST_RECENT_BACKUP_FULL_PATH=$(mfind --type o /$MANTA_USER/stor/backups --name $DB_BACKUP_NAME | tail -n1)
+MOST_RECENT_BACKUP_FULL_PATH=$(mfind --type o /$MANTA_USER/stor/backups/postgres --name $DB_BACKUP_NAME | tail -n1)
 MOST_RECENT_BACKUP=$(mls $MOST_RECENT_BACKUP_FULL_PATH)
 
 dropdb --if-exists -U postgres $DB_BACKUP_NAME
