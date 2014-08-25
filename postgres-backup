@@ -2,8 +2,10 @@
 
 max_dump_age="4"
 
-psql=$(ps -eo comm | grep [p]ostgres | head -n 1 | sed 's/bin\/postgres/bin\/psql/')
-pg_dump=$(ps -eo comm | grep [p]ostgres | head -n 1 | sed 's/bin\/postgres/bin\/pg_dump/')
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+source $DIR/postgres-environment
+
 databases=$(psql -U postgres -c "\l" | grep "^ " | grep -v "^   " | grep -v template0 | awk '{print $1}')
 backup_dir="$HOME/backups/postgres"
 date=$(date '+%Y%m%d%H%M%S')
@@ -13,11 +15,11 @@ mkdir -p $backup_dir
 for database in $databases
 do
   echo "[$(date '+%d/%b/%Y:%H:%M:%S %z')] local backup of database \"$database\" started"
-  $pg_dump -Fc -U postgres $database | gzip > $HOME/$database.$date.dump.gz.tmp
+  pg_dump -Fc -U postgres $database | gzip > $HOME/$database.$date.dump.gz.tmp
   mv $HOME/$database.$date.dump.gz.tmp $backup_dir/$database.$date.dump.gz
   echo "[$(date '+%d/%b/%Y:%H:%M:%S %z')] finished pg_dump of database \"$database\""
   echo "[$(date '+%d/%b/%Y:%H:%M:%S %z')] starting analyze on database \"$database\""
-  $psql -U postgres -c "set vacuum_freeze_min_age=100000; set vacuum_freeze_table_age=10000000; set maintenance_work_mem='1GB'; analyze;" --quiet $database
+  psql -U postgres -c "set vacuum_freeze_min_age=100000; set vacuum_freeze_table_age=10000000; set maintenance_work_mem='1GB'; analyze;" --quiet $database
   echo "[$(date '+%d/%b/%Y:%H:%M:%S %z')] local backup of database \"$database\" finished"
 done
 
