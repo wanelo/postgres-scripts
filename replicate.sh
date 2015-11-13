@@ -17,7 +17,7 @@ DEFAULT_DATA_DIR='/var/pgsql/data93'
 
 MASTER_IP=$1
 DATA_DIR=${2:-$DEFAULT_DATA_DIR}
-SERVICE_NAME=$(svcs -a | grep postgres | awk '{ print $3 }')
+SERVICE_NAME=$(svcs | grep postgres | awk '{ print $3 }')
 
 echo "Using -- data directory: $DATA_DIR"
 echo "           service name: $SERVICE_NAME"
@@ -25,9 +25,9 @@ echo "           ip of master: $MASTER_IP"
 echo
 
 # Ensure services don't interrupt us
-if [ ! -z $SERVICE_NAME ]; then
-  echo "Disabling service $SERVICE_NAME..."
-  svcadm disable -s $SERVICE_NAME
+if [ ! -z "${SERVICE_NAME}" ]; then
+  echo "Disabling service ${SERVICE_NAME}..."
+  svcadm disable -s ${SERVICE_NAME}
 fi
 echo "Disabling chef-client..."
 svcadm disable -s chef-client
